@@ -20,6 +20,7 @@ pub mod errors;
 pub mod index;
 pub mod mempool;
 pub mod query;
+pub mod rest;
 pub mod rpc;
 pub mod signal;
 pub mod store;

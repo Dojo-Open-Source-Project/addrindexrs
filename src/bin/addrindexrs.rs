@@ -20,11 +20,12 @@ use addrindexrs::{
     index::Index,
     query::Query,
     rpc::RPC,
+    rest,
     signal::Waiter,
     store::{full_compaction, is_fully_compacted, DBStore},
 };
 
-fn run_server(config: &Config) -> Result<()> {
+fn run_server(config: Arc<Config>) -> Result<()> {
     let signal = Waiter::start();
     let blocktxids_cache = Arc::new(BlockTxIDsCache::new(config.blocktxids_cache_size));
 
@@ -62,6 +63,7 @@ fn run_server(config: &Config) -> Result<()> {
     let app = App::new(store, index, daemon)?;
     let query = Query::new(app.clone(), config.txid_limit);
 
+    let rest_server = rest::start(Arc::clone(&config), Arc::clone(&query));
     let mut server = None; // Indexer RPC server
     loop {
         app.update(&signal)?;
@@ -69,6 +71,7 @@ fn run_server(config: &Config) -> Result<()> {
         server.get_or_insert_with(|| RPC::start(config.indexer_rpc_addr, query.clone()));
         if let Err(err) = signal.wait(Duration::from_secs(5)) {
             info!("stopping server: {}", err);
+            rest_server.stop();
             break;
         }
     }
@@ -77,7 +80,7 @@ fn run_server(config: &Config) -> Result<()> {
 
 fn main() {
     let config = Config::from_args();
-    if let Err(e) = run_server(&config) {
+    if let Err(e) = run_server(Arc::new(config)) {
         error!("server failed: {}", e.display_chain());
         process::exit(1);
     }

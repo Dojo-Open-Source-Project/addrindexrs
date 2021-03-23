@@ -9,6 +9,9 @@ use std::slice;
 use std::sync::mpsc::{channel, sync_channel, Receiver, Sender, SyncSender};
 use std::thread;
 use time;
+use socket2::{Domain, Protocol, Socket, Type};
+use std::net::SocketAddr;
+
 
 pub type Bytes = Vec<u8>;
 pub type HeaderMap = HashMap<Sha256dHash, BlockHeader>;
@@ -278,6 +281,24 @@ where
         .name(name.to_owned())
         .spawn(f)
         .unwrap()
+}
+
+pub fn create_socket(addr: &SocketAddr) -> Socket {
+    let domain = match &addr {
+        SocketAddr::V4(_) => Domain::ipv4(),
+        SocketAddr::V6(_) => Domain::ipv6(),
+    };
+    let socket =
+        Socket::new(domain, Type::stream(), Some(Protocol::tcp())).expect("creating socket failed");
+
+    #[cfg(unix)]
+    socket
+        .set_reuse_port(true)
+        .expect("cannot enable SO_REUSEPORT");
+
+    socket.bind(&addr.clone().into()).expect("cannot bind");
+
+    socket
 }
 
 #[cfg(test)]
