@@ -147,6 +147,7 @@ pub struct Config {
     pub bulk_index_threads: usize,
     pub txid_limit: usize,
     pub blocktxids_cache_size: usize,
+    pub indexer_http_addr: SocketAddr,
 }
 
 /// Returns default daemon directory
@@ -200,6 +201,12 @@ impl Config {
             Network::Regtest => 60401,
         };
 
+        let default_http_port = match config.network {
+            Network::Bitcoin => 8080,
+            Network::Testnet => 8080,
+            Network::Regtest => 8080,
+        };
+
         let daemon_rpc_addr: SocketAddr = config.daemon_rpc_addr.map_or(
             (DEFAULT_SERVER_ADDRESS, default_daemon_port).into(),
             ResolvAddr::resolve_or_exit,
@@ -207,6 +214,11 @@ impl Config {
 
         let indexer_rpc_addr: SocketAddr = config.indexer_rpc_addr.map_or(
             (DEFAULT_SERVER_ADDRESS, default_indexer_port).into(),
+            ResolvAddr::resolve_or_exit,
+        );
+
+        let indexer_http_addr: SocketAddr = config.indexer_http_addr.map_or(
+            (DEFAULT_SERVER_ADDRESS, default_http_port).into(),
             ResolvAddr::resolve_or_exit,
         );
 
@@ -251,6 +263,7 @@ impl Config {
             daemon_rpc_addr,
             cookie: config.cookie,
             indexer_rpc_addr,
+            indexer_http_addr,
             jsonrpc_import: config.jsonrpc_import,
             index_batch_size: config.index_batch_size,
             bulk_index_threads: config.bulk_index_threads,

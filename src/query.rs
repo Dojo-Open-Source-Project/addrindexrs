@@ -1,3 +1,5 @@
+#![allow(dead_code)]
+
 use bitcoin::consensus::encode::deserialize;
 use bitcoin_hashes::sha256d::Hash as Sha256dHash;
 use std::sync::{Arc, RwLock};
