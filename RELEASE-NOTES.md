@@ -3,10 +3,25 @@
 
 ## Releases ##
 
+- [v0.5.0](#0_5_0)
 - [v0.4.0](#0_4_0)
 - [v0.3.0](#0_3_0)
 - [v0.2.0](#0_2_0)
 - [v0.1.0](#0_1_0)
+
+
+<a name="0_5_0"/>
+
+## addrindexrs v0.5.0 ##
+
+### Change log ###
+
+- [#mr9](https://code.samourai.io/dojo/addrindexrs/-/merge_requests/9) implement a http rest api
+
+
+#### Credits ###
+
+- kenshin-samourai
 
 
 <a name="0_4_0"/>
