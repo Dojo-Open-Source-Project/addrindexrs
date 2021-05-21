@@ -1,6 +1,6 @@
 use bitcoin::consensus::encode::serialize;
 use bitcoin_hashes::hex::{FromHex, ToHex};
-use bitcoin_hashes::sha256d::Hash as Sha256dHash;
+use bitcoin::hash_types::Txid;
 use error_chain::ChainedError;
 use serde_json::{from_str, Value};
 use std::collections::HashMap;
@@ -22,11 +22,11 @@ const PROTOCOL_VERSION: &str = "1.4";
 //
 // Get a script hash from a given value
 //
-fn hash_from_value(val: Option<&Value>) -> Result<Sha256dHash> {
+fn hash_from_value(val: Option<&Value>) -> Result<Txid> {
     // TODO: Sha256dHash should be a generic hash-container (since script hash is single SHA256)
     let script_hash = val.chain_err(|| "missing hash")?;
     let script_hash = script_hash.as_str().chain_err(|| "non-string hash")?;
-    let script_hash = Sha256dHash::from_hex(script_hash).chain_err(|| "non-hex hash")?;
+    let script_hash = Txid::from_hex(script_hash).chain_err(|| "non-hex hash")?;
     Ok(script_hash)
 }
 

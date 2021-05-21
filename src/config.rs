@@ -185,6 +185,7 @@ impl Config {
             Network::Bitcoin => "mainnet",
             Network::Testnet => "testnet",
             Network::Regtest => "regtest",
+            Network::Signet => "signet",
         };
 
         config.db_dir.push(db_subdir);
@@ -193,18 +194,21 @@ impl Config {
             Network::Bitcoin => 8332,
             Network::Testnet => 18332,
             Network::Regtest => 18443,
+            Network::Signet => 38332,
         };
 
         let default_indexer_port = match config.network {
             Network::Bitcoin => 50001,
             Network::Testnet => 60001,
             Network::Regtest => 60401,
+            Network::Signet => 60601,
         };
 
         let default_http_port = match config.network {
             Network::Bitcoin => 8080,
             Network::Testnet => 8080,
             Network::Regtest => 8080,
+            Network::Signet => 8080,
         };
 
         let daemon_rpc_addr: SocketAddr = config.daemon_rpc_addr.map_or(
@@ -226,6 +230,7 @@ impl Config {
             Network::Bitcoin => (),
             Network::Testnet => config.daemon_dir.push("testnet3"),
             Network::Regtest => config.daemon_dir.push("regtest"),
+            Network::Signet => config.daemon_dir.push("signet"),
         }
 
         let mut log = stderrlog::new();

@@ -1,7 +1,6 @@
+use bitcoin::hash_types::BlockHash;
 use bitcoin::blockdata::block::Block;
 use bitcoin::consensus::encode::{deserialize, Decodable};
-use bitcoin::util::hash::BitcoinHash;
-use bitcoin_hashes::sha256d::Hash as Sha256dHash;
 use libc;
 use std::collections::HashSet;
 use std::fs;
@@ -26,13 +25,13 @@ use crate::util::{spawn_thread, HeaderList, SyncChannel};
 struct Parser {
     magic: u32,
     current_headers: HeaderList,
-    indexed_blockhashes: Mutex<HashSet<Sha256dHash>>,
+    indexed_blockhashes: Mutex<HashSet<BlockHash>>,
 }
 
 impl Parser {
     fn new(
         daemon: &Daemon,
-        indexed_blockhashes: HashSet<Sha256dHash>,
+        indexed_blockhashes: HashSet<BlockHash>,
     ) -> Result<Arc<Parser>> {
         Ok(Arc::new(Parser {
             magic: daemon.magic(),
@@ -64,7 +63,7 @@ impl Parser {
 
         let mut rows = Vec::<Row>::new();
         for block in blocks {
-            let blockhash = block.bitcoin_hash();
+            let blockhash = block.header.block_hash();
             if let Some(_header) = self.current_headers.header_by_blockhash(&blockhash) {
                 if self.indexed_blockhashes
                     .lock()
@@ -166,7 +165,7 @@ type JoinHandle = thread::JoinHandle<Result<()>>;
 type BlobReceiver = Arc<Mutex<Receiver<(Vec<u8>, PathBuf)>>>;
 
 //
-// 
+//
 //
 fn start_reader(blk_files: Vec<PathBuf>, parser: Arc<Parser>) -> (BlobReceiver, JoinHandle) {
     let chan = SyncChannel::new(0);

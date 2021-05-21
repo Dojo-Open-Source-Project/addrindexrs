@@ -1,5 +1,5 @@
+use bitcoin::hash_types::Txid;
 use bitcoin::blockdata::transaction::Transaction;
-use bitcoin_hashes::sha256d::Hash as Sha256dHash;
 use hex;
 use std::collections::{BTreeMap, HashMap, HashSet};
 use std::iter::FromIterator;
@@ -93,7 +93,7 @@ impl ReadStore for MempoolStore {
 // Tracker managing mempool transactions
 //
 pub struct Tracker {
-    items: HashMap<Sha256dHash, Transaction>,
+    items: HashMap<Txid, Transaction>,
     index: MempoolStore,
 }
 
@@ -118,7 +118,7 @@ impl Tracker {
 
         let txids_iter = new_txids.difference(&old_txids);
 
-        let txids: Vec<&Sha256dHash> = txids_iter.collect();
+        let txids: Vec<&Txid> = txids_iter.collect();
 
         let txs = match daemon.gettransactions(&txids) {
             Ok(txs) => txs,
@@ -142,12 +142,12 @@ impl Tracker {
         Ok(())
     }
 
-    fn add(&mut self, txid: &Sha256dHash, tx: Transaction) {
+    fn add(&mut self, txid: &Txid, tx: Transaction) {
         self.index.add(&tx);
         self.items.insert(*txid, tx);
     }
 
-    fn remove(&mut self, txid: &Sha256dHash) {
+    fn remove(&mut self, txid: &Txid) {
         let tx = self
             .items
             .remove(txid)

@@ -21,7 +21,7 @@ use url::form_urlencoded;
 use bitcoin::consensus::encode;
 use bitcoin::consensus::encode::serialize;
 use bitcoin_hashes::hex::{FromHex, ToHex};
-use bitcoin_hashes::sha256d::Hash as Sha256dHash;
+use bitcoin::hash_types::Txid;
 use bitcoin::hashes::Error as HashError;
 use hex::{self, FromHexError};
 
@@ -157,7 +157,7 @@ fn handle_request(
         }
 
         (&Method::GET, Some(&"blockchain"), Some(&"scripthash"), Some(script_str), Some(&"history"), None) => {
-            let script_hash = Sha256dHash::from_hex(script_str).chain_err(|| "bad script_hash")?;
+            let script_hash = Txid::from_hex(script_str).chain_err(|| "bad script_hash")?;
             let status = query.status(&script_hash[..])?;
             json_response(
                 json!(serde_json::Value::Array(
@@ -182,7 +182,7 @@ fn handle_request(
             let mut v_txids = vec![];
 
             for script_str in v_script_hashes.iter() {
-                let script_hash = Sha256dHash::from_hex(script_str).chain_err(|| "bad script_hash")?;
+                let script_hash = Txid::from_hex(script_str).chain_err(|| "bad script_hash")?;
                 let status = query.status(&script_hash[..])?;
                 let txids: Vec<String> = status
                     .history()

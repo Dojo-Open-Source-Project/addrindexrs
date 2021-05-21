@@ -1,5 +1,5 @@
 use crate::errors::*;
-use bitcoin_hashes::sha256d::Hash as Sha256dHash;
+use bitcoin::hash_types::{BlockHash, Txid};
 use lru::LruCache;
 use std::hash::Hash;
 use std::sync::Mutex;
@@ -52,7 +52,7 @@ impl<K: Hash + Eq, V> SizedLruCache<K, V> {
 // Cache storing the txids of transactions included in a block
 //
 pub struct BlockTxIDsCache {
-    map: Mutex<SizedLruCache<Sha256dHash /* blockhash */, Vec<Sha256dHash /* txid */>>>,
+    map: Mutex<SizedLruCache<BlockHash, Vec<Txid>>>,
 }
 
 impl BlockTxIDsCache {
@@ -64,11 +64,11 @@ impl BlockTxIDsCache {
 
     pub fn get_or_else<F>(
         &self,
-        blockhash: &Sha256dHash,
+        blockhash: &BlockHash,
         load_txids_func: F,
-    ) -> Result<Vec<Sha256dHash>>
+    ) -> Result<Vec<Txid>>
     where
-        F: FnOnce() -> Result<Vec<Sha256dHash>>,
+        F: FnOnce() -> Result<Vec<Txid>>,
     {
         if let Some(txids) = self.map.lock().unwrap().get(blockhash) {
             return Ok(txids.clone());
@@ -116,17 +116,17 @@ mod tests {
         assert_eq!(cache.get(&9), None);
     }
 
-    fn gen_hash(seed: u8) -> Sha256dHash {
+    fn gen_hash<T: Hash>(seed: u8) -> T {
         let bytes: Vec<u8> = (seed..seed + 32).collect();
-        Sha256dHash::hash(&bytes[..])
+        <T as Hash>::hash(&bytes[..])
     }
 
     #[test]
     fn test_blocktxids_cache_hit_and_miss() {
-        let block1 = gen_hash(1);
-        let block2 = gen_hash(2);
-        let block3 = gen_hash(3);
-        let txids = vec![gen_hash(4), gen_hash(5)];
+        let block1: BlockHash = gen_hash(1);
+        let block2: BlockHash = gen_hash(2);
+        let block3: BlockHash = gen_hash(3);
+        let txids: Vec<Txid> = vec![gen_hash(4), gen_hash(5)];
 
         let misses: Mutex<usize> = Mutex::new(0);
         let miss_func = || {

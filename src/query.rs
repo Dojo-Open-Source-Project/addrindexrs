@@ -1,7 +1,7 @@
 #![allow(dead_code)]
 
 use bitcoin::consensus::encode::deserialize;
-use bitcoin_hashes::sha256d::Hash as Sha256dHash;
+use bitcoin::hash_types::Txid;
 use std::sync::{Arc, RwLock};
 
 use crate::app::App;
@@ -15,17 +15,17 @@ use crate::util::{HashPrefix, HeaderEntry};
 // Output of a Transaction
 //
 pub struct Txo {
-    pub txid: Sha256dHash,
+    pub txid: Txid,
     pub vout: usize,
 }
 
 //
 // Input of a Transaction
 //
-type OutPoint = (Sha256dHash, usize); // (txid, vout)
+type OutPoint = (Txid, usize); // (txid, vout)
 
 struct SpendingInput {
-    txid: Sha256dHash,
+    txid: Txid,
     outpoint: OutPoint,
 }
 
@@ -47,7 +47,7 @@ impl Status {
         self.confirmed.1.iter().chain(self.mempool.1.iter())
     }
 
-    pub fn history(&self) -> Vec<Sha256dHash> {
+    pub fn history(&self) -> Vec<Txid> {
         let mut txns = vec![];
         for f in self.funding() {
             txns.push(f.txid);
@@ -109,7 +109,7 @@ impl Query {
     fn get_prefixes_by_funding_txo(
         &self,
         store: &dyn ReadStore,
-        txid: &Sha256dHash,
+        txid: &Txid,
         vout: usize,
     ) -> Vec<HashPrefix> {
         store
@@ -123,11 +123,11 @@ impl Query {
         &self,
         store: &dyn ReadStore,
         prefixes: Vec<HashPrefix>,
-    ) -> Result<Vec<Sha256dHash>> {
+    ) -> Result<Vec<Txid>> {
         let mut txns = vec![];
         for prefix in prefixes {
             for tx_row in self.get_txrows_by_prefix(store, prefix) {
-                let txid: Sha256dHash = deserialize(&tx_row.key.txid).unwrap();
+                let txid: Txid = deserialize(&tx_row.key.txid).unwrap();
                 txns.push(txid)
             }
         }
