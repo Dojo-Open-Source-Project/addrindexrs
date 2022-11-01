@@ -3,14 +3,24 @@
 
 ## Releases ##
 
-- [v0.5.0](#0_5_0)
-- [v0.4.0](#0_4_0)
-- [v0.3.0](#0_3_0)
-- [v0.2.0](#0_2_0)
-- [v0.1.0](#0_1_0)
+- [v0.6.0](#addrindexrs-v060)
+- [v0.5.0](#addrindexrs-v050)
+- [v0.4.0](#addrindexrs-v040)
+- [v0.3.0](#addrindexrs-v030)
+- [v0.2.0](#addrindexrs-v020)
+- [v0.1.0](#addrindexrs-v010)
 
 
-<a name="0_5_0"/>
+## addrindexrs v0.6.0 ##
+
+### Change log ###
+
+- [18504c54](https://code.samourai.io/dojo/addrindexrs/-/commit/18504c54c0598998e37a4dac5cce6f935fc63727) update rust-bitcoin library to fix a bug with witness size
+
+#### Credits ###
+
+- dojo coder
+
 
 ## addrindexrs v0.5.0 ##
 
@@ -24,7 +34,6 @@
 - kenshin-samourai
 
 
-<a name="0_4_0"/>
 
 ## addrindexrs v0.4.0 ##
 
@@ -38,7 +47,6 @@
 - kenshin-samourai
 
 
-<a name="0_3_0"/>
 
 ## addrindexrs v0.3.0 ##
 
@@ -52,7 +60,6 @@
 - kenshin-samourai
 
 
-<a name="0_2_0"/>
 
 ## addrindexrs v0.2.0 ##
 
@@ -67,7 +74,6 @@
 - kenshin-samourai
 
 
-<a name="0_1_0"/>
 
 ## addrindexrs v0.1.0 ##
 
